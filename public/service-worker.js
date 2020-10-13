@@ -11,7 +11,9 @@ const FILES_TO_CACHE = [
     '/index.js',
     '/db.js',
     'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
-    'https://cdn.jsdelivr.net/npm/chart.js@2.8.0'
+    'https://cdn.jsdelivr.net/npm/chart.js@2.8.0',
+    'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff?v=4.7.0',
+    'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/fonts/fontawesome-webfont.woff2?v=4.7.0'
 ];
 
 self.addEventListener("install", function (evt) {
@@ -57,6 +59,7 @@ self.addEventListener('fetch', function (evt) {
                         return cache.match(evt.request);
                     });
             }).catch(err => console.log(err)));
+            return;
     }
     evt.respondWith(
         caches.open(CACHE_NAME).then(cache => {

@@ -3,19 +3,18 @@ const DATA_CACHE_NAME = "data-cache-v1";
 
 const FILES_TO_CACHE = [
     '/',
-    'index.html',
+    '/index.html',
     '/icons/icon-192x192.png',
     '/icons/icon-512x512.png',
     '/manifest.webmanifest',
     '/styles.css',
     '/index.js',
     '/db.js',
+    'https://stackpath.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css',
+    'https://cdn.jsdelivr.net/npm/chart.js@2.8.0'
 ];
 
 self.addEventListener("install", function (evt) {
-    evt.waitUntil(
-        caches.open(DATA_CACHE_NAME).then((cache) => cache.add("/"))
-    );
 
     evt.waitUntil(
         caches.open(CACHE_NAME).then((cache) => cache.addAll(FILES_TO_CACHE))
@@ -42,23 +41,22 @@ self.addEventListener("activate", function (evt) {
 });
 
 self.addEventListener('fetch', function (evt) {
-    if (evt.request.url.includes('/transaction')) {
-
-        // code to handle requests goes here
+    if (evt.request.url.includes('/api/transaction')) {
         evt.respondWith(
             caches.open(DATA_CACHE_NAME).then(cache => {
-                return cache.match(evt.request).then(response => {
-                    if (response.status === 200) {
-                        cache.put(evt.request.url, response.clone());
-                    }
-
-                    return response;
-                }).catch(err => {
-                    return cache.match(evt.request);
-                });
-            }).catch(err => console.log(err))
-        );
-        return;
+                return fetch(evt.request)
+                    .then(response => {
+                        // If the response was good, clone it and store it in the cache.
+                        if (response.status === 200) {
+                            cache.put(evt.request, response.clone());
+                        }
+                        return response;
+                    })
+                    .catch(err => {
+                        // Network request failed, try to get it from the cache.
+                        return cache.match(evt.request);
+                    });
+            }).catch(err => console.log(err)));
     }
     evt.respondWith(
         caches.open(CACHE_NAME).then(cache => {

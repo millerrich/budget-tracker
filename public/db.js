@@ -18,3 +18,11 @@ request.onsuccess = event => {
 request.onerror = event => {
     if (event) throw event;
 };
+
+const saveRecord = record => {
+    const db = request.result;
+    const transaction = db.transaction(["pending"], "readwrite");
+    const pendingStore = transaction.objectStore("pending");
+
+    pendingStore.add(record);
+};
